@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Shop useful everyday favorites at Little Shop.">
+    <title>Little Shop | Everyday Favorites</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#" aria-label="Little Shop home">little<span>shop</span></a>
+      <a class="cart-link" href="#cart">Cart <span id="cart-count" class="cart-count">0</span></a>
+    </header>
+
+    <main>
+      <section class="hero">
+        <p class="eyebrow">Good things, simply.</p>
+        <h1>Everyday favorites<br>for a brighter day.</h1>
+        <p>Thoughtful little finds, made for wherever life takes you.</p>
+        <a class="shop-button" href="#shop">Shop the collection</a>
+      </section>
+
+      <section id="shop" class="shop-section" aria-labelledby="shop-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">The collection</p>
+            <h2 id="shop-heading">Popular picks</h2>
+          </div>
+          <p>Small joys, starting at $9.</p>
+        </div>
+        <div id="product-grid" class="product-grid"></div>
+      </section>
+
+      <section id="cart" class="cart-section" aria-labelledby="cart-heading">
+        <div class="cart-panel">
+          <div>
+            <p class="eyebrow">Almost yours</p>
+            <h2 id="cart-heading">Your cart</h2>
+            <div id="cart-items" aria-live="polite"></div>
+          </div>
+          <div class="cart-summary">
+            <p class="total-row">Subtotal <strong id="cart-total">$0.00</strong></p>
+            <button id="checkout-button" class="checkout-button" type="button">Place order</button>
+            <p id="order-message" class="order-message" role="status"></p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>Made for everyday moments. <span>© Little Shop</span></footer>
+
+    <script src="store.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
