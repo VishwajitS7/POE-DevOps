@@ -1,23 +1,28 @@
 
 pipeline {
-    agent any
-
-    tools {
-        nodejs 'NodeJS-20'
+    agent {
+        docker {
+            image 'node:20-alpine'
+            args '-u root'
+        }
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                echo 'Checking out GitHub repository'
+                echo 'Repository checked out'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'node --version'
-                sh 'npm --version'
                 sh 'npm run build'
             }
         }
@@ -31,20 +36,18 @@ pipeline {
         stage('Verify') {
             steps {
                 sh 'ls -la dist'
-                echo 'Application build verified!'
             }
         }
     }
 
     post {
         success {
-            archiveArtifacts artifacts: 'dist/**',
-                             fingerprint: true
-            echo 'CI pipeline completed successfully!'
+            archiveArtifacts artifacts: 'dist/**'
+            echo 'Pipeline completed successfully!'
         }
 
         failure {
-            echo 'Pipeline failed. Check console output.'
+            echo 'Pipeline failed!'
         }
     }
 }
