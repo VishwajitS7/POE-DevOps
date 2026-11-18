@@ -1,33 +1,43 @@
 
 pipeline {
-    agent {
-        docker {
-            image 'node:20-alpine'
-            args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
 
     stages {
 
-        stage('Install Docker CLI') {
-            steps {
-                sh 'apk add --no-cache docker-cli'
-            }
-        }
-
         stage('Install Dependencies') {
+            agent {
+                docker {
+                    image 'node:20-alpine'
+                    reuseNode true
+                    args '-u root'
+                }
+            }
             steps {
                 sh 'npm install'
             }
         }
 
         stage('Run Tests') {
+            agent {
+                docker {
+                    image 'node:20-alpine'
+                    reuseNode true
+                    args '-u root'
+                }
+            }
             steps {
                 sh 'npm test'
             }
         }
 
         stage('Build Application') {
+            agent {
+                docker {
+                    image 'node:20-alpine'
+                    reuseNode true
+                    args '-u root'
+                }
+            }
             steps {
                 sh 'npm run build'
             }
@@ -35,7 +45,8 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t little-shop:${BUILD_NUMBER} .'
+                sh 'docker version'
+                sh 'docker build -t little-shop:${BUILD_NUMBER} -t little-shop:latest .'
             }
         }
 
@@ -48,7 +59,7 @@ pipeline {
                       --name little-shop \
                       -p 8082:80 \
                       --restart unless-stopped \
-                      little-shop:${BUILD_NUMBER}
+                      little-shop:latest
                 '''
             }
         }
@@ -56,7 +67,7 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 sh 'docker ps --filter name=little-shop'
-                echo 'Deployment completed!'
+                echo 'Deployment completed successfully!'
             }
         }
     }
