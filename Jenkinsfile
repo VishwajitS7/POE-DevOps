@@ -3,15 +3,15 @@ pipeline {
     agent {
         docker {
             image 'node:20-alpine'
-            args '-u root'
+            args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
 
     stages {
 
-        stage('Checkout') {
+        stage('Install Docker CLI') {
             steps {
-                echo 'Repository checked out'
+                sh 'apk add --no-cache docker-cli'
             }
         }
 
@@ -21,33 +21,54 @@ pipeline {
             }
         }
 
-        stage('Build') {
-            steps {
-                sh 'npm run build'
-            }
-        }
-
-        stage('Test') {
+        stage('Run Tests') {
             steps {
                 sh 'npm test'
             }
         }
 
-        stage('Verify') {
+        stage('Build Application') {
             steps {
-                sh 'ls -la dist'
+                sh 'npm run build'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t little-shop:${BUILD_NUMBER} .'
+            }
+        }
+
+        stage('Deploy Container') {
+            steps {
+                sh '''
+                    docker rm -f little-shop || true
+
+                    docker run -d \
+                      --name little-shop \
+                      -p 8082:80 \
+                      --restart unless-stopped \
+                      little-shop:${BUILD_NUMBER}
+                '''
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                sh 'docker ps --filter name=little-shop'
+                echo 'Deployment completed!'
             }
         }
     }
 
     post {
         success {
-            archiveArtifacts artifacts: 'dist/**'
-            echo 'Pipeline completed successfully!'
+            echo 'CI/CD Pipeline completed successfully!'
+            echo 'Website: http://localhost:8082'
         }
 
         failure {
-            echo 'Pipeline failed!'
+            echo 'Pipeline failed. Check the console output.'
         }
     }
 }
